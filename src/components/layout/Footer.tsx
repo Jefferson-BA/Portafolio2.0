@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { personalInfo, socialLinks } from '@/lib/data';
+import { personalInfo, socialLinks } from '@/data/profile';
 import { FiArrowUpRight } from 'react-icons/fi';
 export default function Footer() {
   return (

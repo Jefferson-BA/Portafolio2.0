@@ -1,10 +1,18 @@
 'use client';
 
-import { useEffect, useRef, type CSSProperties, type HTMLAttributes } from 'react';
+import {
+  useEffect,
+  useRef,
+  type CSSProperties,
+  type HTMLAttributes,
+} from 'react';
 
 export type ClickEffect = 'tear' | 'burst' | 'none';
 
-export interface LetterGlitchProps extends Omit<HTMLAttributes<HTMLDivElement>, 'style'> {
+export interface LetterGlitchProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  'style'
+> {
   glitchColors?: string[];
   baseColor?: string;
   characters?: string;
@@ -66,14 +74,20 @@ type Walker = {
   branch: number;
 };
 
-type WalkerInput = Omit<Walker, 'carry' | 'after' | 'wiggle' | 'branch'> & Partial<Walker>;
+type WalkerInput = Omit<Walker, 'carry' | 'after' | 'wiggle' | 'branch'> &
+  Partial<Walker>;
 
-type Program = { program: WebGLProgram; uniforms: Record<string, WebGLUniformLocation | null> };
+type Program = {
+  program: WebGLProgram;
+  uniforms: Record<string, WebGLUniformLocation | null>;
+};
 
-const DEFAULT_CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$&*()-_+=/[]{};:<>.,0123456789';
-const DEFAULT_FONT = "ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, 'Liberation Mono', monospace";
-const DARK_COLORS = ['#ffffff', '#61dca3'];
-const LIGHT_COLORS = ['#18181b', '#0f9f6e'];
+const DEFAULT_CHARACTERS =
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$&*()-_+=/[]{};:<>.,0123456789';
+const DEFAULT_FONT =
+  "ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, 'Liberation Mono', monospace";
+const DARK_COLORS = ['#ffffff', '#89bfff'];
+const LIGHT_COLORS = ['#18181b', '#2563eb'];
 const MAX_COLORS = 8;
 const INTRO_SECONDS = 1.4;
 const REST_RATE = 0.2;
@@ -177,7 +191,8 @@ void main() {
   outColor = color + uBackground * (1.0 - color.a);
 }`;
 
-const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, value));
 const smoother = (value: number) => {
   const x = clamp(value, 0, 1);
   return x * x * x * (x * (x * 6 - 15) + 10);
@@ -247,9 +262,13 @@ const LetterGlitch = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wakeRef = useRef<(() => void) | null>(null);
-  const customColors = Array.isArray(glitchColors) && glitchColors.length ? glitchColors : null;
+  const customColors =
+    Array.isArray(glitchColors) && glitchColors.length ? glitchColors : null;
   const settings: Settings = {
-    colors: (customColors || (lightMode ? LIGHT_COLORS : DARK_COLORS)).slice(0, MAX_COLORS),
+    colors: (customColors || (lightMode ? LIGHT_COLORS : DARK_COLORS)).slice(
+      0,
+      MAX_COLORS,
+    ),
     baseColor: baseColor || (lightMode ? '#18181b' : '#ffffff'),
     characters: characters || DEFAULT_CHARACTERS,
     fontFamily: fontFamily || DEFAULT_FONT,
@@ -268,7 +287,7 @@ const LetterGlitch = ({
     centerFade: clamp(centerFade, 0, 1),
     intro,
     backgroundColor,
-    dpr
+    dpr,
   };
   const settingsRef = useRef(settings);
   settingsRef.current = settings;
@@ -281,7 +300,7 @@ const LetterGlitch = ({
       premultipliedAlpha: true,
       antialias: false,
       depth: false,
-      stencil: false
+      stencil: false,
     });
     if (!container || !canvas || !gl) return undefined;
 
@@ -303,7 +322,9 @@ const LetterGlitch = ({
     const maxSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
     const atlas = document.createElement('canvas');
     const atlasContext = atlas.getContext('2d');
-    const probe = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+    const probe = document
+      .createElement('canvas')
+      .getContext('2d', { willReadFrequently: true });
     if (!atlasContext) return undefined;
 
     const colorCache = new Map<string, number[]>();
@@ -324,10 +345,28 @@ const LetterGlitch = ({
       return rgb;
     };
 
-    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    const reduce =
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
     const view = { width: 1, height: 1, ratio: 1 };
-    const grid = { cols: 0, rows: 0, cellW: 0, cellH: 0, originX: 0, originY: 0, atlasColumns: 1 };
-    const pointer = { x: 0, y: 0, sx: 0, sy: 0, inside: false, presence: 0, stir: 0, fresh: true };
+    const grid = {
+      cols: 0,
+      rows: 0,
+      cellW: 0,
+      cellH: 0,
+      originX: 0,
+      originY: 0,
+      atlasColumns: 1,
+    };
+    const pointer = {
+      x: 0,
+      y: 0,
+      sx: 0,
+      sy: 0,
+      inside: false,
+      presence: 0,
+      stir: 0,
+      fresh: true,
+    };
     const walkers: Walker[] = [];
     const palette = new Float32Array(MAX_COLORS * 3);
     const loadedFonts = new Set<string>();
@@ -366,7 +405,9 @@ const LetterGlitch = ({
     const randomColor = () => (Math.random() * colorCount) | 0;
 
     const restValue = (i: number, appear = 1) =>
-      luck[i] < settingsRef.current.density ? Math.round(level[i] * 255 * appear) : 0;
+      luck[i] < settingsRef.current.density
+        ? Math.round(level[i] * 255 * appear)
+        : 0;
 
     const cellAt = (x: number, y: number) => {
       const c = Math.floor((x - grid.originX) / grid.cellW);
@@ -375,7 +416,14 @@ const LetterGlitch = ({
       return r * grid.cols + c;
     };
 
-    const ignite = (i: number, strength: number, holdTime: number, fadeTime: number, color: number, after = 0) => {
+    const ignite = (
+      i: number,
+      strength: number,
+      holdTime: number,
+      fadeTime: number,
+      color: number,
+      after = 0,
+    ) => {
       if (slot[i] < 0) {
         slot[i] = activeCount;
         active[activeCount++] = i;
@@ -413,28 +461,49 @@ const LetterGlitch = ({
       const unique = Array.from(new Set(chars)).slice(0, 256);
       atlasContext.font = font;
       let advance = 1;
-      unique.forEach(char => {
+      unique.forEach((char) => {
         advance = Math.max(advance, atlasContext.measureText(char).width);
       });
       const metrics = atlasContext.measureText('M');
       const cellW = Math.max(2, Math.ceil(advance + size * s.spacing));
       const cellH = Math.max(2, Math.ceil(size * (0.95 + s.spacing)));
-      const columns = Math.max(1, Math.min(unique.length, Math.floor(maxSize / cellW)));
+      const columns = Math.max(
+        1,
+        Math.min(unique.length, Math.floor(maxSize / cellW)),
+      );
       atlas.width = columns * cellW;
       atlas.height = Math.ceil(unique.length / columns) * cellH;
       atlasContext.font = font;
       atlasContext.textAlign = 'center';
       atlasContext.textBaseline = 'alphabetic';
       atlasContext.fillStyle = '#ffffff';
-      const baseline = cellH / 2 + (metrics.actualBoundingBoxAscent - metrics.actualBoundingBoxDescent) / 2;
+      const baseline =
+        cellH / 2 +
+        (metrics.actualBoundingBoxAscent - metrics.actualBoundingBoxDescent) /
+          2;
       unique.forEach((char, i) => {
-        atlasContext.fillText(char, (i % columns) * cellW + cellW / 2, Math.floor(i / columns) * cellH + baseline);
+        atlasContext.fillText(
+          char,
+          (i % columns) * cellW + cellW / 2,
+          Math.floor(i / columns) * cellH + baseline,
+        );
       });
       gl.bindTexture(gl.TEXTURE_2D, atlasTexture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, atlas);
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        atlas,
+      );
       const lookup = new Map(unique.map((char, i) => [char, i]));
-      const nextPool = chars.map(char => lookup.get(char)).filter((index): index is number => index !== undefined);
-      const charsChanged = nextPool.length !== pool.length || nextPool.some((index, i) => index !== pool[i]);
+      const nextPool = chars
+        .map((char) => lookup.get(char))
+        .filter((index): index is number => index !== undefined);
+      const charsChanged =
+        nextPool.length !== pool.length ||
+        nextPool.some((index, i) => index !== pool[i]);
       pool = nextPool.length ? nextPool : [0];
       const resized = cellW !== grid.cellW || cellH !== grid.cellH;
       grid.cellW = cellW;
@@ -511,10 +580,21 @@ const LetterGlitch = ({
       active = new Int32Array(n);
       activeCount = 0;
       walkers.length = 0;
-      for (let i = 0; i < n; i++) data[i * 4 + 1] = born[i] >= 0 ? 0 : restValue(i);
+      for (let i = 0; i < n; i++)
+        data[i * 4 + 1] = born[i] >= 0 ? 0 : restValue(i);
       density = settingsRef.current.density;
       gl.bindTexture(gl.TEXTURE_2D, stateTexture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, cols, rows, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA8,
+        cols,
+        rows,
+        0,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        data,
+      );
       dirty = false;
     };
 
@@ -550,7 +630,8 @@ const LetterGlitch = ({
     };
 
     const addWalker = (walker: WalkerInput) => {
-      if (walkers.length < MAX_WALKERS) walkers.push({ carry: 0, after: 0, wiggle: 0, branch: 0, ...walker });
+      if (walkers.length < MAX_WALKERS)
+        walkers.push({ carry: 0, after: 0, wiggle: 0, branch: 0, ...walker });
     };
 
     const spawnTear = (x: number, y: number) => {
@@ -566,8 +647,9 @@ const LetterGlitch = ({
         const color = randomColor();
         const rowY = grid.originY + (r + 0.5) * grid.cellH;
         const shift = (Math.random() - 0.5) * 6 * grid.cellW * (1 - weight);
-        [0, Math.PI].forEach(angle => {
-          const life = width * (0.12 + 0.5 * weight * (0.4 + 0.6 * Math.random()));
+        [0, Math.PI].forEach((angle) => {
+          const life =
+            width * (0.12 + 0.5 * weight * (0.4 + 0.6 * Math.random()));
           addWalker({
             x: x + shift,
             y: rowY,
@@ -576,7 +658,7 @@ const LetterGlitch = ({
             span: life,
             speed: (2200 + Math.random() * 1200) * view.ratio,
             after: Math.abs(dr) * 0.035 + Math.random() * 0.03,
-            color
+            color,
           });
         });
       }
@@ -597,7 +679,7 @@ const LetterGlitch = ({
           speed: (700 + Math.random() * 400) * view.ratio,
           wiggle: 0.2,
           branch: 0.03,
-          color: randomColor()
+          color: randomColor(),
         });
       }
     };
@@ -619,7 +701,8 @@ const LetterGlitch = ({
         }
         const step = Math.max(
           1,
-          Math.abs(Math.cos(w.angle)) * grid.cellW + Math.abs(Math.sin(w.angle)) * grid.cellH * 0.6
+          Math.abs(Math.cos(w.angle)) * grid.cellW +
+            Math.abs(Math.sin(w.angle)) * grid.cellH * 0.6,
         );
         w.carry += w.speed * dt;
         while (w.carry >= step && w.life > 0) {
@@ -634,7 +717,13 @@ const LetterGlitch = ({
             break;
           }
           const left = w.life / w.span;
-          ignite(i, 0.5 + 0.5 * left, 0.03 + Math.random() * 0.05, 0.5 + 0.5 * left, w.color);
+          ignite(
+            i,
+            0.5 + 0.5 * left,
+            0.03 + Math.random() * 0.05,
+            0.5 + 0.5 * left,
+            w.color,
+          );
           if (w.branch && Math.random() < w.branch) {
             const side = Math.random() < 0.5 ? -1 : 1;
             const life = w.life * (0.45 + Math.random() * 0.3);
@@ -646,7 +735,7 @@ const LetterGlitch = ({
               span: w.span,
               speed: w.speed,
               wiggle: w.wiggle,
-              color: w.color
+              color: w.color,
             });
           }
         }
@@ -683,10 +772,13 @@ const LetterGlitch = ({
           const long = roll < 0.015;
           const length = Math.min(
             grid.cols - c,
-            long ? 10 + ((Math.random() * 24) | 0) : 2 + ((Math.random() * 7) | 0)
+            long
+              ? 10 + ((Math.random() * 24) | 0)
+              : 2 + ((Math.random() * 7) | 0),
           );
           const pace = (long ? 0.012 : 0.028) / tempo;
-          for (let k = 0; k < length; k++) ignite(i + k, strength, holdTime, fadeTime, color, k * pace);
+          for (let k = 0; k < length; k++)
+            ignite(i + k, strength, holdTime, fadeTime, color, k * pace);
         } else {
           ignite(i, strength, holdTime, fadeTime, color);
         }
@@ -698,15 +790,29 @@ const LetterGlitch = ({
       if (pointer.presence < 0.02 || reduce || !count) return;
       const radius = s.cursorRadius * view.ratio;
       if (radius < 1) return;
-      const c0 = Math.max(0, Math.floor((pointer.sx - radius - grid.originX) / grid.cellW));
-      const c1 = Math.min(grid.cols - 1, Math.floor((pointer.sx + radius - grid.originX) / grid.cellW));
-      const r0 = Math.max(0, Math.floor((pointer.sy - radius - grid.originY) / grid.cellH));
-      const r1 = Math.min(grid.rows - 1, Math.floor((pointer.sy + radius - grid.originY) / grid.cellH));
+      const c0 = Math.max(
+        0,
+        Math.floor((pointer.sx - radius - grid.originX) / grid.cellW),
+      );
+      const c1 = Math.min(
+        grid.cols - 1,
+        Math.floor((pointer.sx + radius - grid.originX) / grid.cellW),
+      );
+      const r0 = Math.max(
+        0,
+        Math.floor((pointer.sy - radius - grid.originY) / grid.cellH),
+      );
+      const r1 = Math.min(
+        grid.rows - 1,
+        Math.floor((pointer.sy + radius - grid.originY) / grid.cellH),
+      );
       const chance = pointer.presence * (3 + 9 * pointer.stir) * dt;
       for (let r = r0; r <= r1; r++) {
-        const dy = (grid.originY + (r + 0.5) * grid.cellH - pointer.sy) / radius;
+        const dy =
+          (grid.originY + (r + 0.5) * grid.cellH - pointer.sy) / radius;
         for (let c = c0; c <= c1; c++) {
-          const dx = (grid.originX + (c + 0.5) * grid.cellW - pointer.sx) / radius;
+          const dx =
+            (grid.originX + (c + 0.5) * grid.cellW - pointer.sx) / radius;
           const d = dx * dx + dy * dy;
           if (d >= 1) continue;
           const i = r * grid.cols + c;
@@ -727,7 +833,7 @@ const LetterGlitch = ({
         if (Math.random() > falloff) continue;
         const i = cellAt(
           pointer.sx + Math.cos(angle) * distance * radius,
-          pointer.sy + Math.sin(angle) * distance * radius
+          pointer.sy + Math.sin(angle) * distance * radius,
         );
         if (i < 0) continue;
         ignite(
@@ -735,7 +841,7 @@ const LetterGlitch = ({
           (0.3 + 0.7 * Math.random()) * (0.45 + 0.55 * pointer.stir),
           0.02 + Math.random() * 0.08,
           0.35 + Math.random() * 0.4,
-          randomColor()
+          randomColor(),
         );
       }
     };
@@ -744,7 +850,7 @@ const LetterGlitch = ({
       const s = settingsRef.current;
       const tempo = Math.max(s.speed, 0.5);
       const attack = 1 - Math.exp(-dt / 0.05);
-      for (let k = 0; k < activeCount; ) {
+      for (let k = 0; k < activeCount;) {
         const i = active[k];
         if (delay[i] > 0) {
           delay[i] -= dt;
@@ -767,7 +873,9 @@ const LetterGlitch = ({
         wait[i] -= dt;
         if (wait[i] <= 0) {
           data[i * 4] = randomGlyph();
-          wait[i] = ((0.045 + 0.45 * (1 - h) * (1 - h)) * (0.6 + 0.8 * Math.random())) / tempo;
+          wait[i] =
+            ((0.045 + 0.45 * (1 - h) * (1 - h)) * (0.6 + 0.8 * Math.random())) /
+            tempo;
         }
         data[i * 4 + 2] = Math.round(h * 255);
         dirty = true;
@@ -788,7 +896,13 @@ const LetterGlitch = ({
           continue;
         }
         if (age < dt && Math.random() < (luck[i] < s.density ? 0.45 : 0.12)) {
-          ignite(i, 0.4 + 0.5 * Math.random(), 0.02, 0.35 + Math.random() * 0.35, randomColor());
+          ignite(
+            i,
+            0.4 + 0.5 * Math.random(),
+            0.02,
+            0.35 + Math.random() * 0.35,
+            randomColor(),
+          );
         }
         const appear = s.smooth ? smoother(age / 0.35) : 1;
         data[i * 4 + 1] = restValue(i, appear);
@@ -806,6 +920,11 @@ const LetterGlitch = ({
         applyResize();
       }
       if (!visible || document.hidden) return;
+      // Decorative rendering at 30fps leaves more GPU time for direct interaction.
+      if (last && now - last < 1000 / 30) {
+        raf = requestAnimationFrame(frame);
+        return;
+      }
       const s = settingsRef.current;
       const dt = last ? clamp((now - last) / 1000, 0.0005, 0.05) : 1 / 60;
       last = now;
@@ -815,19 +934,23 @@ const LetterGlitch = ({
       syncPalette();
       if (s.density !== density) {
         density = s.density;
-        for (let i = 0; i < count; i++) if (born[i] < 0) data[i * 4 + 1] = restValue(i);
+        for (let i = 0; i < count; i++)
+          if (born[i] < 0) data[i * 4 + 1] = restValue(i);
         dirty = true;
       }
       const goal = s.interactive && pointer.inside && !reduce ? 1 : 0;
-      pointer.presence += (goal - pointer.presence) * (1 - Math.exp(-dt / 0.25));
+      pointer.presence +=
+        (goal - pointer.presence) * (1 - Math.exp(-dt / 0.25));
       if (Math.abs(goal - pointer.presence) < 0.002) pointer.presence = goal;
       const px = pointer.sx;
       const py = pointer.sy;
       const follow = 1 - Math.exp(-dt / 0.07);
       pointer.sx += (pointer.x - pointer.sx) * follow;
       pointer.sy += (pointer.y - pointer.sy) * follow;
-      const moved = Math.hypot(pointer.sx - px, pointer.sy - py) / view.ratio / dt;
-      pointer.stir += (clamp(moved / 1400, 0, 1) - pointer.stir) * (1 - Math.exp(-dt / 0.12));
+      const moved =
+        Math.hypot(pointer.sx - px, pointer.sy - py) / view.ratio / dt;
+      pointer.stir +=
+        (clamp(moved / 1400, 0, 1) - pointer.stir) * (1 - Math.exp(-dt / 0.12));
       if (pointer.stir < 0.001) pointer.stir = 0;
       reveal(dt);
       ambient(dt);
@@ -842,7 +965,17 @@ const LetterGlitch = ({
       gl.activeTexture(gl.TEXTURE1);
       gl.bindTexture(gl.TEXTURE_2D, stateTexture);
       if (dirty) {
-        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, grid.cols, grid.rows, gl.RGBA, gl.UNSIGNED_BYTE, data);
+        gl.texSubImage2D(
+          gl.TEXTURE_2D,
+          0,
+          0,
+          0,
+          grid.cols,
+          grid.rows,
+          gl.RGBA,
+          gl.UNSIGNED_BYTE,
+          data,
+        );
         dirty = false;
       }
       gl.uniform1i(u.uState, 1);
@@ -886,7 +1019,8 @@ const LetterGlitch = ({
     };
 
     function wake() {
-      if (!raf && visible && !document.hidden) raf = requestAnimationFrame(frame);
+      if (!raf && visible && !document.hidden)
+        raf = requestAnimationFrame(frame);
     }
 
     let resizePending = false;
@@ -928,7 +1062,8 @@ const LetterGlitch = ({
     const onPointerDown = (event: PointerEvent) => {
       locate(event);
       const s = settingsRef.current;
-      if (!pointer.inside || s.clickEffect === 'none' || reduce || !count) return;
+      if (!pointer.inside || s.clickEffect === 'none' || reduce || !count)
+        return;
       spawnBurst(pointer.x, pointer.y);
       wake();
     };
@@ -944,7 +1079,10 @@ const LetterGlitch = ({
 
     const onVisibility = () => {
       last = 0;
-      wake();
+      if (document.hidden) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+      } else wake();
     };
 
     const onFonts = () => {
@@ -954,11 +1092,15 @@ const LetterGlitch = ({
 
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
-    const intersection = new IntersectionObserver(entries => {
-      visible = entries.some(entry => entry.isIntersecting);
+    const intersection = new IntersectionObserver((entries) => {
+      visible = entries.some((entry) => entry.isIntersecting);
       if (visible) {
         last = 0;
         wake();
+      } else {
+        cancelAnimationFrame(raf);
+        raf = 0;
+        last = 0;
       }
     });
     intersection.observe(container);
@@ -982,14 +1124,22 @@ const LetterGlitch = ({
       window.removeEventListener('pointerdown', onPointerDown);
       window.removeEventListener('pointerup', onPointerUp);
       window.removeEventListener('pointercancel', onPointerUp);
-      document.documentElement.removeEventListener('pointerleave', onPointerLeave);
+      document.documentElement.removeEventListener(
+        'pointerleave',
+        onPointerLeave,
+      );
       document.removeEventListener('visibilitychange', onVisibility);
       document.fonts?.removeEventListener?.('loadingdone', onFonts);
       gl.deleteTexture(atlasTexture);
       gl.deleteTexture(stateTexture);
       gl.deleteVertexArray(vao);
       gl.deleteProgram(program.program);
-      if (!canvas.isConnected) gl.getExtension('WEBGL_lose_context')?.loseContext();
+      const releaseContext = () => {
+        if (!canvas.isConnected)
+          gl.getExtension('WEBGL_lose_context')?.loseContext();
+      };
+      if (canvas.isConnected) requestAnimationFrame(releaseContext);
+      else releaseContext();
     };
   }, []);
 
@@ -1000,11 +1150,17 @@ const LetterGlitch = ({
   return (
     <div
       ref={containerRef}
-      className={['relative h-full w-full overflow-hidden', className].filter(Boolean).join(' ')}
+      className={['relative h-full w-full overflow-hidden', className]
+        .filter(Boolean)
+        .join(' ')}
       style={style}
       {...rest}
     >
-      <canvas ref={canvasRef} className="absolute inset-0 block h-full w-full" aria-hidden="true" />
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 block h-full w-full"
+        aria-hidden="true"
+      />
     </div>
   );
 };

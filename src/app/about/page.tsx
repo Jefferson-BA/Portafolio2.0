@@ -1,8 +1,9 @@
-﻿import type { Metadata } from 'next';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { FiArrowUpRight, FiDownload } from 'react-icons/fi';
-import { personalInfo, projects } from '@/lib/data';
-import Portrait from '@/components/Portrait';
+import { personalInfo } from '@/data/profile';
+import { projects } from '@/data/projects';
+import ProfileCard from '@/components/profile/ProfileCard';
 
 export const metadata: Metadata = {
   title: 'Sobre mí',
@@ -15,7 +16,7 @@ export default function AboutPage() {
     <div className="shell page-content">
       <p className="eyebrow">02 / UN POCO SOBRE MÍ</p>
       <div className="about-grid">
-        <Portrait />
+        <ProfileCard />
         <div>
           <h1>
             Detrás de

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import { projects } from '@/lib/data';
-import ProjectGallery from '@/components/ProjectGallery';
-import ProjectCard from '@/components/ProjectCard';
+import { projects } from '@/data/projects';
+import ProjectGallery from '@/components/projects/ProjectGallery';
+import ProjectCard from '@/components/projects/ProjectCard';
 export const metadata: Metadata = {
   title: 'Proyectos',
   description: 'Explora los proyectos de Jefferson en una galería interactiva.',

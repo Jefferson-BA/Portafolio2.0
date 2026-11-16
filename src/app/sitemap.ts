@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
-import { projects, personalInfo } from '@/lib/data';
+import { personalInfo } from '@/data/profile';
+import { projects } from '@/data/projects';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = personalInfo.siteUrl;

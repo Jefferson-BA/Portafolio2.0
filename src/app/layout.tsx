@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import { personalInfo } from '@/lib/data';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
+import { personalInfo } from '@/data/profile';
 export const metadata: Metadata = {
   metadataBase: new URL(personalInfo.siteUrl),
   title: {

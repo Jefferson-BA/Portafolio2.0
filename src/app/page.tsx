@@ -1,59 +1,19 @@
 import Link from 'next/link';
-import { FiArrowDown, FiArrowUpRight, FiDownload } from 'react-icons/fi';
-import { personalInfo } from '@/lib/data';
-import Portrait from '@/components/Portrait';
-import HeroBackground from '@/components/HeroBackground';
-import ProjectGallery from '@/components/ProjectGallery';
-import SocialLinks from '@/components/SocialLinks';
+import { FiArrowUpRight } from 'react-icons/fi';
+import { personalInfo } from '@/data/profile';
+import MinimalistHero from '@/components/home/MinimalistHero';
+import ProjectGallery from '@/components/projects/ProjectGallery';
+import SocialLinks from '@/components/contact/SocialLinks';
 
 export default function Home() {
   return (
     <>
-      <section className="hero">
-        <HeroBackground />
-        <div className="hero-shade" />
-        <div className="shell hero-grid">
-          <div className="hero-copy">
-            <p className="eyebrow">
-              <span className="status-dot" />
-              PORTAFOLIO PERSONAL
-            </p>
-            <h1>
-              Hola, soy
-              <br />
-              <span>{personalInfo.name}</span>
-              <span className="heading-dot">.</span>
-            </h1>
-            <p className="hero-role">{personalInfo.title}</p>
-            <p className="hero-description">{personalInfo.description}</p>
-            <div className="hero-actions">
-              <Link href="#proyectos" className="button button-primary">
-                Explorar proyectos <FiArrowUpRight />
-              </Link>
-              {personalInfo.cvUrl ? (
-                <a
-                  href={personalInfo.cvUrl}
-                  className="button button-quiet"
-                  download
-                >
-                  Descargar CV <FiDownload />
-                </a>
-              ) : (
-                <Link href="/about" className="button button-quiet">
-                  Conoce mi perfil <FiArrowUpRight />
-                </Link>
-              )}
-            </div>
-          </div>
-          <Portrait />
-        </div>
-        <div className="shell hero-bottom">
-          <a href="#proyectos">
-            <FiArrowDown /> Sigue explorando
-          </a>
-          <span>IDEAS · CÓDIGO · EXPERIENCIAS</span>
-        </div>
-      </section>
+      <MinimalistHero
+        mainText={personalInfo.description}
+        readMoreLink="/about"
+        overlayText={{ part1: personalInfo.name, part2: 'Bautista Aguilera' }}
+        locationText={personalInfo.location}
+      />
       <section className="shell section" id="proyectos">
         <div className="section-heading">
           <div>

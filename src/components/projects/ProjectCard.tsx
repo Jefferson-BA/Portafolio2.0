@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { FiArrowUpRight } from 'react-icons/fi';
-import type { Project } from '@/types';
+import type { Project } from '@/types/project';
 export default function ProjectCard({
   project,
   priority = false,

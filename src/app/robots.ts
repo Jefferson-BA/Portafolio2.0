@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next';
-import { personalInfo } from '@/lib/data';
+import { personalInfo } from '@/data/profile';
 
 export default function robots(): MetadataRoute.Robots {
   return {

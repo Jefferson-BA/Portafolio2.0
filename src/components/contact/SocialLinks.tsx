@@ -5,7 +5,7 @@ import {
   FiInstagram,
 } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
-import { socialLinks } from '@/lib/data';
+import { socialLinks } from '@/data/profile';
 
 const icons = {
   linkedin: FiLinkedin,

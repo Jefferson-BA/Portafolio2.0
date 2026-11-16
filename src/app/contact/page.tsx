@@ -1,6 +1,6 @@
-﻿import type { Metadata } from 'next';
-import { personalInfo } from '@/lib/data';
-import SocialLinks from '@/components/SocialLinks';
+import type { Metadata } from 'next';
+import { personalInfo } from '@/data/profile';
+import SocialLinks from '@/components/contact/SocialLinks';
 import { FiArrowUpRight, FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
 
 export const metadata: Metadata = {

@@ -1,11 +1,17 @@
-﻿'use client';
+'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FiArrowUpRight, FiPause, FiPlay } from 'react-icons/fi';
-import CircularCarousel from './CircularCarousel';
-import { projects } from '@/lib/data';
+import { useDeferredVisual } from '@/hooks/useDeferredVisual';
+import { projects } from '@/data/projects';
+
+const CircularCarousel = dynamic(() => import('./CircularCarousel'), {
+  ssr: false,
+});
 
 const items = projects.map((project) => ({
   src: project.image,
@@ -17,12 +23,14 @@ const items = projects.map((project) => ({
 export default function ProjectGallery() {
   const [active, setActive] = useState(0);
   const [playing, setPlaying] = useState(true);
+  const ref = useRef<HTMLDivElement>(null);
+  const enabled = useDeferredVisual(ref);
   const router = useRouter();
   const project = projects[active];
   if (!project) return null;
 
   return (
-    <div className="project-gallery">
+    <div ref={ref} className="project-gallery">
       <div className="gallery-topline">
         <span>WEB Y MÓVIL · SELECCIÓN DE PROYECTOS</span>
         <button
@@ -35,25 +43,41 @@ export default function ProjectGallery() {
         </button>
       </div>
       <div className="carousel-stage">
-        <CircularCarousel
-          items={items}
-          preset="cylinder"
-          intro="assemble"
-          cardWidth={480}
-          aspectRatio={1.6}
-          gap={55}
-          curve={0.3}
-          tilt={-7}
-          autoplay={playing ? 'drift' : 'off'}
-          speed={7}
-          fadeColor="#101713"
-          depthFade={0.4}
-          cornerRadius={12}
-          onChange={setActive}
-          onItemClick={(_, index) =>
-            router.push(`/projects/${projects[index].slug}`)
-          }
-        />
+        {enabled ? (
+          <CircularCarousel
+            items={items}
+            preset="cylinder"
+            intro="assemble"
+            cardWidth={480}
+            aspectRatio={1.6}
+            gap={55}
+            curve={0.3}
+            tilt={-7}
+            autoplay={playing ? 'drift' : 'off'}
+            speed={7}
+            fadeColor="#0c1423"
+            depthFade={0.4}
+            cornerRadius={12}
+            onChange={setActive}
+            onItemClick={(_, index) =>
+              router.push(`/projects/${projects[index].slug}`)
+            }
+          />
+        ) : (
+          <Link
+            className="gallery-placeholder"
+            href={`/projects/${project.slug}`}
+            aria-label={`Ver ${project.title}`}
+          >
+            <Image
+              src={project.image}
+              alt={`Portada de ${project.title}`}
+              fill
+              sizes="(max-width: 600px) 90vw, 480px"
+              className="object-contain"
+            />
+          </Link>
+        )}
       </div>
       <div className="gallery-bottom">
         <div>
