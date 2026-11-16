@@ -1,4 +1,4 @@
-export interface Project {
+﻿export interface Project {
   slug: string;
   title: string;
   description: string;
@@ -7,12 +7,9 @@ export interface Project {
   demoUrl?: string;
   githubUrl?: string;
   featured: boolean;
-}
-
-export interface Metadata {
-  title: string;
-  description: string;
-  keywords?: string[];
-  author?: string;
-  ogImage?: string;
+  category: string;
+  role: string;
+  period?: string;
+  imageNote?: string;
+  highlights: string[];
 }

@@ -1,65 +1,88 @@
-import Image from 'next/image';
-import { Metadata } from 'next';
-import { personalInfo } from '@/lib/data';
-import avatarLocal from '../avatar.jpg';
+﻿import type { Metadata } from 'next';
+import Link from 'next/link';
+import { FiArrowUpRight, FiDownload } from 'react-icons/fi';
+import { personalInfo, projects } from '@/lib/data';
+import Portrait from '@/components/Portrait';
 
 export const metadata: Metadata = {
-  title: 'Sobre Mí',
-  description: `Conoce más sobre ${personalInfo.name}, ${personalInfo.title}`,
+  title: 'Sobre mí',
+  description: personalInfo.bio,
 };
 
 export default function AboutPage() {
+  const experience = projects[0];
   return (
-    <div className="relative overflow-hidden min-h-screen">
-      <div className="absolute top-20 right-1/4 w-[500px] h-[500px] bg-blue-400/10 rounded-full blur-[120px] animate-pulse -z-10 pointer-events-none"></div>
-
-      <div className="container mx-auto px-4 py-16 relative z-10 animate-fade-in-up">
-        <div className="max-w-5xl mx-auto bg-white/70 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-          <div className="md:flex flex-row">
-            
-            <div className="md:w-1/2 relative h-[400px] md:h-auto overflow-hidden group">
-              <div className="absolute inset-0 bg-blue-600/10 group-hover:bg-transparent transition-colors z-10 pointer-events-none"></div>
-              <Image
-                src={avatarLocal} 
-                alt={personalInfo.name}
-                fill
-                priority 
-                className="object-cover group-hover:scale-105 transition-transform duration-700"
-                sizes="(max-width: 768px) 100vw, 50vw"
-              />
-            </div>
-
-            <div className="p-8 md:p-12 md:w-1/2 flex flex-col justify-center bg-gradient-to-br from-white/50 to-blue-50/30">
-              <h1 className="text-3xl md:text-5xl font-extrabold mb-4 text-gray-900 tracking-tight">
-                Sobre <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Mí</span>
-              </h1>
-              <h2 className="text-xl md:text-2xl text-blue-600 font-medium mb-6">
-                {personalInfo.title}
-              </h2>
-              <div className="space-y-4 text-gray-600 leading-relaxed mb-8">
-                <p>
-                  Soy un desarrollador apasionado por crear soluciones web innovadoras y eficientes. Me especializo en tecnologías modernas como Next.js, React y TypeScript.
-                </p>
-                <p>
-                  Mi objetivo es transformar ideas complejas en interfaces de usuario intuitivas y experiencias digitales excepcionales, aplicando siempre las mejores prácticas de optimización y SEO.
-                </p>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4 mt-auto">
-                <div className="bg-white/80 p-4 rounded-2xl shadow-sm border border-gray-100 hover:-translate-y-1 transition-transform">
-                  <h3 className="font-bold text-gray-900 text-sm mb-1">Tecnologías</h3>
-                  <p className="text-blue-600 text-sm font-medium">React, Next.js, TS</p>
-                </div>
-                <div className="bg-white/80 p-4 rounded-2xl shadow-sm border border-gray-100 hover:-translate-y-1 transition-transform">
-                  <h3 className="font-bold text-gray-900 text-sm mb-1">Enfoque</h3>
-                  <p className="text-purple-600 text-sm font-medium">UX/UI & SEO</p>
-                </div>
-              </div>
-            </div>
-
+    <div className="shell page-content">
+      <p className="eyebrow">02 / UN POCO SOBRE MÍ</p>
+      <div className="about-grid">
+        <Portrait />
+        <div>
+          <h1>
+            Detrás de
+            <br />
+            cada <span>idea.</span>
+          </h1>
+          <h2 className="about-role">{personalInfo.fullName}</h2>
+          <p className="profile-location">
+            {personalInfo.title} · {personalInfo.location}
+          </p>
+          <p className="page-intro">{personalInfo.bio}</p>
+          <div className="hero-actions">
+            <Link href="/projects" className="button button-primary">
+              Explorar proyectos <FiArrowUpRight />
+            </Link>
+            <a
+              href={personalInfo.cvUrl}
+              download
+              className="button button-quiet"
+            >
+              Descargar CV <FiDownload />
+            </a>
           </div>
         </div>
       </div>
+      <section className="profile-section">
+        <p className="eyebrow">MI CAJA DE HERRAMIENTAS</p>
+        <h2>
+          De la interfaz <span>a los datos.</span>
+        </h2>
+        <div className="skills">
+          {personalInfo.skills.map((skill) => (
+            <span key={skill}>{skill}</span>
+          ))}
+        </div>
+      </section>
+      <section className="profile-section profile-timeline">
+        <div>
+          <p className="eyebrow">EXPERIENCIA LABORAL</p>
+          <h2>{experience.title}</h2>
+          <p className="timeline-meta">CHIRU S.A.C. · {experience.period}</p>
+          <h3>{experience.role}</h3>
+          <ul className="project-highlights">
+            {experience.highlights.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+          <Link href={`/projects/${experience.slug}`} className="text-link">
+            Conoce el proyecto <FiArrowUpRight />
+          </Link>
+        </div>
+        <div>
+          <p className="eyebrow">FORMACIÓN ACADÉMICA</p>
+          <h2>{personalInfo.education.institution}</h2>
+          <p className="timeline-meta">{personalInfo.education.period}</p>
+          <h3>{personalInfo.education.degree}</h3>
+          <p className="profile-location">{personalInfo.education.detail}</p>
+          <div className="additional-info">
+            {personalInfo.additional.map((item) => (
+              <div key={item.title}>
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

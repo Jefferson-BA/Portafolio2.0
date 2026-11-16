@@ -1,119 +1,97 @@
-import { Metadata } from 'next';
+﻿import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { FiArrowLeft, FiArrowUpRight } from 'react-icons/fi';
 import { projects } from '@/lib/data';
 
-type Props = {
-  params: Promise<{ slug: string }>;
-};
+type Props = { params: Promise<{ slug: string }> };
 
-export async function generateStaticParams() {
-  return projects.map((project) => ({
-    slug: project.slug,
-  }));
+export function generateStaticParams() {
+  return projects.map((project) => ({ slug: project.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const project = projects.find((p) => p.slug === slug);
-
-  if (!project) {
-    return {
-      title: 'Proyecto no encontrado',
-    };
-  }
-
-  return {
-    title: project.title,
-    description: project.description,
-    openGraph: {
-      title: project.title,
-      description: project.description,
-      images: [project.image],
-      type: 'article',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: project.title,
-      description: project.description,
-      images: [project.image],
-    },
-  };
+  const project = projects.find((project) => project.slug === slug);
+  return project
+    ? { title: project.title, description: project.description }
+    : { title: 'Proyecto no encontrado' };
 }
 
 export default async function ProjectDetailPage({ params }: Props) {
   const { slug } = await params;
-  const project = projects.find((p) => p.slug === slug);
-
-  if (!project) {
-    notFound();
-  }
+  const project = projects.find((project) => project.slug === slug);
+  if (!project) notFound();
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <Link
-        href="/projects"
-        className="text-blue-600 hover:underline mb-6 inline-block"
-      >
-        ← Volver a Proyectos
+    <div className="shell page-content">
+      <Link href="/projects" className="text-link">
+        <FiArrowLeft /> Volver a proyectos
       </Link>
-
       <article>
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          {project.title}
-        </h1>
-
-        <div className="relative w-full h-96 mb-8 rounded-lg overflow-hidden">
-          <Image
-            src={project.image}
-            alt={project.title}
-            fill
-            className="object-cover"
-            priority
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-          />
+        <p className="eyebrow detail-category">{project.category}</p>
+        <h1 className="detail-title">{project.title}</h1>
+        <div className="project-meta">
+          <span>{project.role}</span>
+          {project.period && <span>{project.period}</span>}
         </div>
-
-        <p className="text-lg text-gray-700 mb-6">{project.description}</p>
-
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">
-            Tecnologías Utilizadas
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {project.technologies.map((tech) => (
-              <span
-                key={tech}
-                className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
-              >
-                {tech}
-              </span>
-            ))}
+        <figure>
+          <div className="detail-cover">
+            <Image
+              src={project.image}
+              alt={`Portada ilustrativa de ${project.title}`}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 1200px"
+              className="object-cover"
+            />
           </div>
-        </div>
-
-        <div className="flex gap-4">
+          <figcaption className="image-note">{project.imageNote}</figcaption>
+        </figure>
+        <p className="detail-copy">{project.description}</p>
+        <section className="detail-section">
+          <h2>Mi participación</h2>
+          <ul className="project-highlights">
+            {project.highlights.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </section>
+        {project.technologies.length > 0 && (
+          <section className="detail-section">
+            <h2>Tecnologías utilizadas</h2>
+            <div className="skills">
+              {project.technologies.map((tech) => (
+                <span key={tech}>{tech}</span>
+              ))}
+            </div>
+          </section>
+        )}
+        <div className="hero-actions">
           {project.demoUrl && (
             <a
+              className="button button-primary"
               href={project.demoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
             >
-              Ver Demo
+              Ver demo <FiArrowUpRight />
             </a>
           )}
           {project.githubUrl && (
             <a
+              className="button button-quiet"
               href={project.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-gray-800 text-white px-6 py-3 rounded-lg hover:bg-gray-900 transition"
             >
-              Ver Código
+              Ver código <FiArrowUpRight />
             </a>
           )}
+          <Link href="/contact" className="text-link">
+            Conversemos sobre este proyecto <FiArrowUpRight />
+          </Link>
         </div>
       </article>
     </div>

@@ -1,79 +1,63 @@
-import { Metadata } from 'next';
+﻿import type { Metadata } from 'next';
 import { personalInfo } from '@/lib/data';
+import SocialLinks from '@/components/SocialLinks';
+import { FiArrowUpRight, FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
 
-// 1. Meta tags específicos para la página de contacto
 export const metadata: Metadata = {
   title: 'Contacto',
-  description: `Ponte en contacto con ${personalInfo.name}. Hablemos sobre proyectos, colaboraciones o nuevas oportunidades.`,
-  openGraph: {
-    title: 'Contacto - Portafolio',
-    description: 'Ponte en contacto conmigo para oportunidades laborales o proyectos.',
-    url: `${personalInfo.siteUrl}/contact`,
-  },
+  description:
+    'Conecta con Jefferson Bautista Aguilera para conversar sobre proyectos.',
 };
 
 export default function ContactPage() {
+  const contacts = [
+    {
+      label: 'Correo electrónico',
+      href: `mailto:${personalInfo.email}`,
+      text: personalInfo.email,
+      Icon: FiMail,
+    },
+    {
+      label: 'Teléfono',
+      href: personalInfo.phoneHref,
+      text: personalInfo.phone,
+      Icon: FiPhone,
+    },
+  ];
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-900 mb-6 text-center">
-          Ponte en Contacto
-        </h1>
-        <p className="text-lg text-gray-600 mb-8 text-center">
-          ¿Tienes un proyecto en mente o simplemente quieres saludar? Llena el formulario y me pondré en contacto contigo lo antes posible.
-        </p>
-
-        <form className="bg-white shadow-md rounded-lg p-8 space-y-6">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-              Nombre
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
-              placeholder="Tu nombre"
-            />
-          </div>
-          
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Correo Electrónico
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
-              placeholder="tu@email.com"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
-              Mensaje
-            </label>
-            <textarea
-              id="message"
-              name="message"
-              rows={5}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors resize-none"
-              placeholder="¿En qué te puedo ayudar?"
-            ></textarea>
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-md hover:bg-blue-700 transition-colors focus:ring-4 focus:ring-blue-200"
+    <div className="shell page-content contact-page">
+      <p className="eyebrow">03 / CONECTEMOS</p>
+      <h1>
+        Una conversación.
+        <br />
+        <span>Muchas posibilidades.</span>
+      </h1>
+      <p className="page-intro">
+        Para una nueva idea, un proyecto o una oportunidad, este es el punto de
+        partida.
+      </p>
+      <p className="contact-location">
+        <FiMapPin />
+        {personalInfo.location}
+      </p>
+      <div className="contact-options">
+        {contacts.map(({ label, href, text, Icon }) => (
+          <a
+            key={label}
+            href={href}
+            target={href.startsWith('https:') ? '_blank' : undefined}
+            rel={href.startsWith('https:') ? 'noopener noreferrer' : undefined}
           >
-            Enviar Mensaje
-          </button>
-        </form>
+            <Icon />
+            <div>
+              <span className="eyebrow">{label}</span>
+              <h2>{text}</h2>
+            </div>
+            <FiArrowUpRight />
+          </a>
+        ))}
       </div>
+      <SocialLinks />
     </div>
   );
 }
